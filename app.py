@@ -29,4 +29,4 @@ demo = gr.Interface(
     theme=gr.themes.Soft()
 )
 
-demo.launch()
+demo.launch(share=True)
