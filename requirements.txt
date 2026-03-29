@@ -1,4 +1,8 @@
 tensorflow
 pillow
 numpy
+requests
 gradio
+flask
+flask-cors
+gunicorn
