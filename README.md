@@ -66,4 +66,4 @@ Open `cat-dog-classify.ipynb` in Google Colab:
 ## 👨‍💻 Author
 **Joydip Paul**
 - Hugging Face: [Joydeip](https://huggingface.co/Joydeip)
-- GitHub: [YOUR_GITHUB_USERNAME](https://github.com/Joydeip)
+- GitHub: [Joydeip](https://github.com/Joydeip)
