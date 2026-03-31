@@ -4,60 +4,50 @@ from PIL import Image
 import numpy as np
 import requests
 import io
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import threading
-
-# ── Flask Backend ──
-flask_app = Flask(__name__)
-CORS(flask_app)
 
 model = load_model("my_cnn_model(cat-dog).h5")
 
-def preprocess_image(image_bytes):
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    img = img.resize((256, 256))
-    img_array = np.array(img) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
-
-@flask_app.route("/predict", methods=["POST"])
-def predict():
-    file = request.files["file"]
-    img_array = preprocess_image(file.read())
-    prediction = model.predict(img_array)[0][0]
-    label = "Dog 🐶" if prediction > 0.5 else "Cat 🐱"
-    confidence = float(prediction if prediction > 0.5 else 1 - prediction)
-    return jsonify({"label": label, "confidence": round(confidence * 100, 2)})
-
-@flask_app.route("/predict-url", methods=["POST"])
-def predict_url():
-    data = request.get_json()
-    url = data.get("url", "")
+def predict(image, url):
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, timeout=10, headers=headers)
-        response.raise_for_status()
-        img_array = preprocess_image(response.content)
+        if url and url.strip() != "":
+            headers = {"User-Agent": "Mozilla/5.0"}
+            resp = requests.get(url.strip(), timeout=10, headers=headers)
+            resp.raise_for_status()
+            image = Image.open(io.BytesIO(resp.content)).convert("RGB")
+        elif image is not None:
+            image = image.convert("RGB")
+        else:
+            return "⚠️ Please upload an image or enter a URL!"
+
+        img = image.resize((256, 256))
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+
+        prediction = model.predict(img_array)[0][0]
+        label = "Dog 🐶" if prediction > 0.5 else "Cat 🐱"
+        confidence = float(prediction if prediction > 0.5 else 1 - prediction)
+        return {label: round(confidence, 2)}
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
-    prediction = model.predict(img_array)[0][0]
-    label = "Dog 🐶" if prediction > 0.5 else "Cat 🐱"
-    confidence = float(prediction if prediction > 0.5 else 1 - prediction)
-    return jsonify({"label": label, "confidence": round(confidence * 100, 2)})
+        return f"❌ Error: {str(e)}"
 
-@flask_app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "awake"}), 200
 
-# ── Run Flask in background thread ──
-def run_flask():
-    flask_app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
-
-threading.Thread(target=run_flask, daemon=True).start()
-
-# ── Gradio just serves the HTML file ──
-with gr.Blocks() as demo:
-    gr.HTML(open("index.html").read())
+demo = gr.Interface(
+    fn=predict,
+    inputs=[
+        gr.Image(type="pil", label="📁 Upload Image"),
+        gr.Textbox(label="🔗 Or Paste Image URL", placeholder="https://example.com/cat.jpg")
+    ],
+    outputs=gr.Label(label="Prediction"),
+    title="🐾 Cat or Dog Classifier",
+    description="Upload an image or paste a URL to predict whether it's a cat or a dog!",
+    examples=[
+        ["sample_cat.jpg", ""],
+        ["sample_dog.jpg", ""],
+        ["sample_cat2.jpg", ""],
+        ["sample_dog2.jpg", ""],
+    ],
+    theme=gr.themes.Soft()
+)
 
 demo.launch(server_name="0.0.0.0", server_port=7860)
