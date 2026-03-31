@@ -3,6 +3,4 @@ pillow
 numpy
 requests
 gradio
-flask
-flask-cors
-gunicorn
+h5py
