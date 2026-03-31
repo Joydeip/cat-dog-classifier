@@ -1,12 +1,42 @@
----
-title: Cat Dog Classifier
-emoji: 👀
-colorFrom: red
-colorTo: pink
-sdk: gradio
-sdk_version: 6.10.0
-app_file: app.py
-pinned: false
----
+# 🐾 Cat or Dog Classifier
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+A Deep Learning CNN model that classifies images as cats or dogs.
+
+## 🚀 Live Demo
+👉 [Try it on Hugging Face](https://huggingface.co/spaces/Joydeip/cat-dog-classifier)
+
+## 📸 Screenshots
+![App Screenshot](screenshot.png)
+
+## 🛠️ Built With
+- Python
+- TensorFlow / Keras
+- Gradio
+- Hugging Face Spaces
+
+## 🧠 Model Details
+- Architecture: CNN (Convolutional Neural Network)
+- Input Size: 256x256
+- Classes: Cat 🐱 / Dog 🐶
+- Training Data: Cat and Dog images dataset
+
+## 📁 Project Structure
+```
+cat-dog-classifier/
+├── app.py                      ← Gradio web app
+├── requirements.txt            ← dependencies
+├── sample_cat.jpg              ← sample cat image
+├── sample_dog.jpg              ← sample dog image
+└── my_cnn_model(cat-dog).h5   ← trained model (Git LFS)
+```
+
+## ⚙️ Run Locally
+```bash
+git clone https://github.com/YOUR_USERNAME/cat-dog-classifier
+cd cat-dog-classifier
+pip install -r requirements.txt
+python app.py
+```
+
+## 👨‍💻 Author
+**Joydip Paul**
